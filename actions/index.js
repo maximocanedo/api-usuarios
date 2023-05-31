@@ -1,5 +1,5 @@
 "use strict";
-const { login, logout, authenticateToken } = require("./sessions");
-const { getUserByUsername } = require("./users");
+const sessions = require("./sessions");
+const users = require("./users");
 
-module.exports = { login, logout, authenticateToken, getUserByUsername };
+module.exports = { ...sessions, ...users };
