@@ -1,10 +1,14 @@
 "use strict";
 const express = require("express");
-
 const actions = require("./actions/index");
-
 const app = express();
 app.use(express.json());
+
+/* Pre-respuesta */
+app.use((req, res, next) => {
+	res.set("Content-Type", "application/json; charset=utf-8");
+	next();
+});
 
 /* Obtener data */
 app.get("/users/:username", actions.getUserByUsername);
