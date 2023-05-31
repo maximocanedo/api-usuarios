@@ -1,21 +1,28 @@
 "use strict";
 class Response {
-  constructor(obj) {
-    let newObj = {
-      ErrorFound: false,
-      Message: "",
-      Details: "",
-      Exception: null,
-      AffectedRows: 0,
-      ObjectReturned: null,
-      ...obj,
-    };
-    this.ErrorFound = newObj.ErrorFound;
-    this.Message = newObj.Message;
-    this.Details = newObj.Details;
-    this.Exception = newObj.Exception;
-    this.AffectedRows = newObj.AffectedRows;
-    this.ObjectReturned = newObj.ObjectReturned;
-  }
+	constructor(obj) {
+		let newObj = {
+			ErrorFound: false,
+			Message: "",
+			Details: "",
+			Exception: null,
+			Code: 200,
+			AffectedRows: 0,
+			ObjectReturned: null,
+			...obj,
+		};
+		Object.assign(this, newObj);
+	}
+	asJSON() {
+		return JSON.parse({
+			ErrorFound: this.ErrorFound,
+			Message: this.Message,
+			Details: this.Details,
+			Exception: this.Exception,
+			Code: this.Code,
+			AffectedRows: this.AffectedRows,
+			ObjectReturned: this.ObjectReturned,
+		});
+	}
 }
 module.exports = Response;
