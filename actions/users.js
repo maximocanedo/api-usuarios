@@ -1,7 +1,5 @@
 "use strict";
 const User = require("./../entity/User");
-const Hash = require("./../entity/Hash");
-const Token = require("./../entity/Token");
 const UserLogic = require("./../logic/UserLogic");
 const HashLogic = require("./../logic/HashLogic");
 const { rawLogin } = require("./../actions/sessions");
@@ -74,4 +72,22 @@ const createUser = async (req, res) => {
 	});
 };
 
-module.exports = { getUserByUsername, createUser };
+const viewMyUser = async (req, res) => {
+	let username = req.user.username;
+	let user_logic = new UserLogic();
+	let y = await user_logic.getByUsername(username);
+	res.json(user_logic.user);
+};
+
+const changePassword = async (req, res) => {
+	req.params.username = req.user.username;
+	let hl = new HashLogic();
+	let result = await hl.CreatePassword(
+		req.user.username,
+		req.params.password
+	);
+	let finalResult = result.SummaryResult;
+	res.status(finalResult ? 200 : 500).json(result);
+};
+
+module.exports = { getUserByUsername, createUser, viewMyUser, changePassword };

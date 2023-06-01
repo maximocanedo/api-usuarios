@@ -1,7 +1,6 @@
 "use strict";
 const Connection = require("./../data/Connection");
 const User = require("./../entity/User");
-const actions = require("./../actions/index");
 const utilities = require("./../logic/utilities");
 
 class UserLogic {

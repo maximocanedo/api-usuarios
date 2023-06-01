@@ -11,7 +11,13 @@ app.use((req, res, next) => {
 });
 
 /* Obtener data */
+app.get("/users/me", actions.authenticateToken, actions.viewMyUser);
 app.get("/users/:username", actions.getUserByUsername);
+app.post(
+	"/users/me/changePassword",
+	actions.authenticateToken,
+	actions.changePassword
+);
 app.post("/users/add", actions.createUser);
 
 /* Manejo de sesiones */
@@ -20,6 +26,7 @@ app.post("/logout", actions.authenticateToken, actions.logout);
 
 /* Probar conexión */
 app.get("/protected", actions.authenticateToken, (req, res) => {
+	console.log({ username: req.user.username });
 	res.json({ message: "Acceso permitido", username: req.user });
 });
 

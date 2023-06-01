@@ -1,5 +1,4 @@
 "use strict";
-const Response = require("./../entity/Response");
 const Connection = require("./../data/Connection");
 const Hash = require("./../entity/Hash");
 const bcrypt = require("bcrypt");
