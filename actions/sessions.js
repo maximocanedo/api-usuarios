@@ -24,10 +24,9 @@ const authenticateToken = async (req, res, next) => {
 		next();
 	});
 };
-const login = async (req, res) => {
-	const { username, password } = req.query;
+const rawLogin = async (username, password) => {
 	let hsh = new HashLogic();
-	hsh.CheckPassword(
+	return await hsh.CheckPassword(
 		{
 			user: username,
 			password: password,
@@ -44,12 +43,35 @@ const login = async (req, res) => {
 				);
 				let tkn = new TokenLogic();
 				let rs = await tkn.Insert(token, 1, date);
-				if (rs.result) res.status(200).json({ token });
+				console.log({ RSRESULT: rs.result });
+				if (rs.result) {
+					return {
+						status: 200,
+						json: { token },
+					};
+				} else {
+					return {
+						status: 400,
+						json: {
+							err: "rs.result ERROR",
+						},
+					};
+				}
 			} else {
-				res.status(403).json({ err: "Usuario o contraseña inválidos" });
+				return {
+					status: 403,
+					json: {
+						err: "Usuario o contraseña inválidos. ",
+					},
+				};
 			}
 		}
 	);
+};
+const login = async (req, res) => {
+	const { username, password } = req.query;
+	let result = rawLogin(username, password);
+	res.status(result.status).json(result.json);
 };
 const logout = async (req, res) => {
 	const token = req.headers["authorization"];
@@ -69,4 +91,4 @@ const logout = async (req, res) => {
 	}
 };
 
-module.exports = { login, logout, authenticateToken };
+module.exports = { rawLogin, login, logout, authenticateToken };

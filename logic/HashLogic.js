@@ -4,6 +4,27 @@ const Connection = require("./../data/Connection");
 const Hash = require("./../entity/Hash");
 const bcrypt = require("bcrypt");
 
+function securePassword(password) {
+	const saltRounds = 10;
+
+	return new Promise((resolve, reject) => {
+		bcrypt.genSalt(saltRounds, function (err, salt) {
+			if (err) {
+				console.log({ err });
+				reject(err);
+			}
+			bcrypt.hash(password, salt, function (err, hash) {
+				if (err) {
+					console.log({ err });
+					reject(err);
+				}
+
+				resolve({ hash, salt });
+			});
+		});
+	});
+}
+
 class HashLogic {
 	constructor(hash = new Hash()) {
 		let data = {
@@ -42,29 +63,90 @@ class HashLogic {
 					const isMatch = await bcrypt.compare(password, hash);
 
 					if (isMatch) {
-						await next({
+						return await next({
 							errCode: 200,
 							msg: "Inicio de sesión exitoso.",
 						});
 					} else {
-						await next({
+						return await next({
 							errCode: 403,
 							msg: "Credenciales inválidas",
 						});
 					}
 				} catch (err) {
-					await next({
+					return await next({
 						errCode: 401,
 						msg: "Error al comparar las contraseñas",
 					});
 				}
 			} else {
-				await next({
+				return await next({
 					errCode: 404,
 					msg: "Credenciales inválidas",
 				});
 			}
 		}
+	}
+	async UnableAllFrom(user) {
+		let cn = new Connection(Connection.Database.Eclair);
+		let result = cn.Response.ErrorFound
+			? cn.Response
+			: await cn.RunTransaction(
+					`UPDATE [${this.Table}] SET [${this.Columns.active}] = 0 WHERE [${this.Columns.user}] = '${user}'`
+			  );
+		console.log({ UNABLING: result });
+		return {
+			result: !result.ErrorFound,
+		};
+	}
+	async CreatePassword(user, password) {
+		let VerificationsResult = false;
+		let CleaningResult = false;
+		let CryptingResult = false;
+		let InsertResult = false;
+
+		let checkPassword = (str) => {
+			const regex = /^[^\s]{8,24}$/;
+			return regex.test(str);
+		};
+
+		VerificationsResult = checkPassword(password);
+
+		try {
+			const { hash, salt } = await securePassword(password);
+
+			// Cancelamos todos los hashes previos (De haber)
+			let _unabling = await this.UnableAllFrom(user);
+			console.log({ SECURING: true, _unabling });
+			CleaningResult = _unabling.result;
+
+			// Agregamos el hash y el salt a la base de datos
+			CryptingResult = true;
+			let cn = new Connection(Connection.Database.Eclair);
+			let result = cn.Response.ErrorFound
+				? cn.Response
+				: await cn.RunTransaction(
+						`INSERT INTO [${this.Table}] ([${this.Columns.user}],[${this.Columns.hash}],[${this.Columns.salt}],[${this.Columns.lastModified}],[${this.Columns.active}]) SELECT '${user}', '${hash}', '${salt}', GETDATE(), '1'`
+				  );
+			console.log({ INSERTRESULT: result });
+			InsertResult = result.AffectedRows == 1;
+		} catch (error) {
+			CryptingResult = false;
+		}
+
+		let SummaryResult =
+			VerificationsResult &&
+			CleaningResult &&
+			CryptingResult &&
+			InsertResult;
+
+		return {
+			SummaryResult,
+			VerificationsResult,
+			CleaningResult,
+			CryptingResult,
+			InsertResult,
+		};
 	}
 }
 module.exports = HashLogic;

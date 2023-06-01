@@ -12,6 +12,7 @@ app.use((req, res, next) => {
 
 /* Obtener data */
 app.get("/users/:username", actions.getUserByUsername);
+app.post("/users/add", actions.createUser);
 
 /* Manejo de sesiones */
 app.post("/login", actions.login);
