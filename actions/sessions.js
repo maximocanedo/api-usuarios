@@ -51,7 +51,7 @@ const rawLogin = async (username, password) => {
 					};
 				} else {
 					return {
-						status: 400,
+						status: 500,
 						json: {
 							err: "rs.result ERROR",
 						},
@@ -59,7 +59,7 @@ const rawLogin = async (username, password) => {
 				}
 			} else {
 				return {
-					status: 403,
+					status: 404,
 					json: {
 						err: "Usuario o contraseña inválidos. ",
 					},
@@ -70,7 +70,10 @@ const rawLogin = async (username, password) => {
 };
 const login = async (req, res) => {
 	const { username, password } = req.query;
-	let result = rawLogin(username, password);
+	let result = await rawLogin(username, password);
+	console.log({
+		LOGIN_RESULT: result,
+	});
 	res.status(result.status).json(result.json);
 };
 const logout = async (req, res) => {

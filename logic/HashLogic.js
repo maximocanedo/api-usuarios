@@ -5,7 +5,6 @@ const bcrypt = require("bcrypt");
 
 function securePassword(password) {
 	const saltRounds = 10;
-
 	return new Promise((resolve, reject) => {
 		bcrypt.genSalt(saltRounds, function (err, salt) {
 			if (err) {
@@ -17,7 +16,7 @@ function securePassword(password) {
 					console.log({ err });
 					reject(err);
 				}
-
+				console.log({ hash, salt });
 				resolve({ hash, salt });
 			});
 		});
@@ -99,6 +98,7 @@ class HashLogic {
 		};
 	}
 	async CreatePassword(user, password) {
+		console.log({ user, password });
 		let VerificationsResult = false;
 		let CleaningResult = false;
 		let CryptingResult = false;
@@ -113,7 +113,7 @@ class HashLogic {
 
 		try {
 			const { hash, salt } = await securePassword(password);
-
+			console.log(33, { hash, salt });
 			// Cancelamos todos los hashes previos (De haber)
 			let _unabling = await this.UnableAllFrom(user);
 			console.log({ SECURING: true, _unabling });

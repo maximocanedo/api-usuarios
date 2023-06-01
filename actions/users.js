@@ -80,12 +80,10 @@ const viewMyUser = async (req, res) => {
 };
 
 const changePassword = async (req, res) => {
-	req.params.username = req.user.username;
+	let username = req.user.username;
+	let password = req.query.password;
 	let hl = new HashLogic();
-	let result = await hl.CreatePassword(
-		req.user.username,
-		req.params.password
-	);
+	let result = await hl.CreatePassword(username, password);
 	let finalResult = result.SummaryResult;
 	res.status(finalResult ? 200 : 500).json(result);
 };

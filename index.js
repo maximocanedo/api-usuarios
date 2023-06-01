@@ -12,12 +12,12 @@ app.use((req, res, next) => {
 
 /* Obtener data */
 app.get("/users/me", actions.authenticateToken, actions.viewMyUser);
-app.get("/users/:username", actions.getUserByUsername);
 app.post(
 	"/users/me/changePassword",
 	actions.authenticateToken,
 	actions.changePassword
 );
+app.get("/users/:username", actions.getUserByUsername);
 app.post("/users/add", actions.createUser);
 
 /* Manejo de sesiones */
