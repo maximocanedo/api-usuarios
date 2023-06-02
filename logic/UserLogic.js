@@ -58,10 +58,7 @@ class UserLogic {
 	}
 	async AddUser(user) {
 		let userCheckAvailability = await this.getByUsername(user.username);
-		let userCheckWritting = (str) => {
-			const regex = /^[a-zA-Z0-9_-]{3,24}$/;
-			return regex.test(str);
-		};
+		let userCheckWritting = (x) => /^[a-zA-Z0-9_-]{3,24}$/.test(x);
 		let _usernameCheckAvailability = {
 			res: userCheckAvailability.Code == 404,
 			err: "El nombre de usuario ya existe",
