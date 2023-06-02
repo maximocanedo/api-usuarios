@@ -104,10 +104,7 @@ class HashLogic {
 		let CryptingResult = false;
 		let InsertResult = false;
 
-		let checkPassword = (str) => {
-			const regex = /^[^\s]{8,24}$/;
-			return regex.test(str);
-		};
+		let checkPassword = (x) => /^[^\s]{8,24}$/.test(x);
 
 		VerificationsResult = checkPassword(password);
 
